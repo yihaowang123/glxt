@@ -15,12 +15,17 @@ const nextConfig = {
 
   experimental: {
     optimizePackageImports: ['lucide-react'],
+    outputFileTracingExcludes: [
+      '**/cache/**',
+      '**/.cache/**',
+      '**/node_modules/.cache/**',
+    ],
   },
 
-  webpack: (config, { isServer, dev }) => {
-    if (!isServer && !dev) {
-      config.cache = false;
+  webpack: (config, { isServer }) => {
+    config.cache = false;
 
+    if (!isServer) {
       if (!config.optimization) {
         config.optimization = {};
       }
@@ -48,7 +53,7 @@ const nextConfig = {
           priority: 40,
         },
         supabase: {
-          test: /[\\/]node_modules[\\/]@supabase[\\/]/,
+          test: /[\\/]node_modules[\\/](@supabase)[\\/]/,
           name: 'vendor-supabase',
           chunks: 'all',
           priority: 35,
