@@ -13,14 +13,7 @@ const nextConfig = {
     ],
   },
 
-  experimental: {
-    optimizePackageImports: ['lucide-react'],
-    outputFileTracingExcludes: [
-      '**/cache/**',
-      '**/.cache/**',
-      '**/node_modules/.cache/**',
-    ],
-  },
+  trailingSlash: false,
 
   webpack: (config, { isServer }) => {
     config.cache = false;
