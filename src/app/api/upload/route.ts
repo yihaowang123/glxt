@@ -15,24 +15,8 @@ async function generateUploadToken(accessKey: string, secretKey: string, bucket:
     .replace(/\//g, '_')
     .replace(/=+$/, '');
 
-  const cryptoKey = await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(secretKey),
-    { name: 'HMAC', hash: 'SHA-1' },
-    false,
-    ['sign']
-  );
-
-  const signatureBuffer = await crypto.subtle.sign(
-    'HMAC',
-    cryptoKey,
-    new TextEncoder().encode(encodedPolicy)
-  );
-
-  const signature = Buffer.from(signatureBuffer).toString('base64')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
+  const signString = encodedPolicy;
+  const signature = await hmacSha1(secretKey, signString);
 
   const uploadToken = `${accessKey}:${signature}:${encodedPolicy}`;
 
@@ -40,13 +24,32 @@ async function generateUploadToken(accessKey: string, secretKey: string, bucket:
     accessKey: accessKey.substring(0, 4) + '...',
     bucket,
     deadline,
-    policyString,
-    encodedPolicy: encodedPolicy.substring(0, 20) + '...',
-    signature: signature.substring(0, 10) + '...',
-    tokenLength: uploadToken.length,
+    encodedPolicyLength: encodedPolicy.length,
+    signatureLength: signature.length,
   });
 
   return uploadToken;
+}
+
+async function hmacSha1(secretKey: string, data: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const keyData = encoder.encode(secretKey);
+  const messageData = encoder.encode(data);
+
+  const cryptoKey = await crypto.subtle.importKey(
+    'raw',
+    keyData,
+    { name: 'HMAC', hash: 'SHA-1' },
+    false,
+    ['sign']
+  );
+
+  const signatureBuffer = await crypto.subtle.sign('HMAC', cryptoKey, messageData);
+
+  return Buffer.from(signatureBuffer).toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
 }
 
 export async function POST() {
@@ -65,13 +68,16 @@ export async function POST() {
     });
 
     if (!accessKey || !secretKey || !bucket || !domain) {
-      console.error('[Upload] Missing Qiniu configuration:', {
-        QINIU_ACCESS_KEY: accessKey ? 'set' : 'MISSING',
-        QINIU_SECRET_KEY: secretKey ? 'set' : 'MISSING',
-        QINIU_BUCKET_NAME: bucket ? 'set' : 'MISSING',
-        QINIU_DOMAIN: domain ? 'set' : 'MISSING',
-      });
-      return NextResponse.json({ error: 'Qiniu config missing' }, { status: 500 });
+      console.error('[Upload] Missing Qiniu configuration');
+      return NextResponse.json({
+        error: 'Qiniu config missing',
+        details: {
+          QINIU_ACCESS_KEY: accessKey ? 'set' : 'MISSING',
+          QINIU_SECRET_KEY: secretKey ? 'set' : 'MISSING',
+          QINIU_BUCKET_NAME: bucket ? 'set' : 'MISSING',
+          QINIU_DOMAIN: domain ? 'set' : 'MISSING',
+        }
+      }, { status: 500 });
     }
 
     const uploadToken = await generateUploadToken(accessKey, secretKey, bucket);
