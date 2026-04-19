@@ -1,0 +1,44 @@
+{
+  "name": "glxt",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@radix-ui/react-checkbox": "^1.1.2",
+    "@radix-ui/react-dialog": "^1.1.2",
+    "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-popover": "^1.1.2",
+    "@radix-ui/react-scroll-area": "^1.2.0",
+    "@radix-ui/react-select": "^2.1.2",
+    "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-tabs": "^1.1.1",
+    "@supabase/ssr": "^0.5.1",
+    "@supabase/supabase-js": "^2.45.4",
+    "autoprefixer": "^10.5.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "date-fns": "^3.6.0",
+    "exceljs": "^4.4.0",
+    "lucide-react": "^0.447.0",
+    "next": "^14.2.15",
+    "qiniu-js": "^3.4.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^2.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.16.10",
+    "@types/react": "^18.3.10",
+    "@types/react-dom": "^18.3.0",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.15",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.13",
+    "typescript": "^5.6.2"
+  }
+}

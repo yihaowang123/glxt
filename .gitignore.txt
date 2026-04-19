@@ -1,0 +1,24 @@
+# 依赖文件夹
+node_modules/
+
+# Next.js 构建文件夹
+.next/
+
+# 环境变量（绝对不能上传！）
+.env
+.env.local
+.env.*.local
+
+# 调试日志
+npm-debug.log*
+
+# IDE设置
+.vscode/
+
+# Mac系统文件
+.DS_Store
+
+# Next.js 构建产物和缓存
+.next/
+.next/cache/
+node_modules/
