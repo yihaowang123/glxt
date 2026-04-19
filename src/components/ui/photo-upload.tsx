@@ -30,6 +30,7 @@ export default function PhotoUpload({ value, onChange }: PhotoUploadProps) {
       });
 
       console.log('[PhotoUpload] Token response status:', tokenResponse.status);
+      console.log('[PhotoUpload] Token response headers:', Object.fromEntries(tokenResponse.headers.entries()));
 
       if (!tokenResponse.ok) {
         const errorText = await tokenResponse.text();
@@ -37,7 +38,10 @@ export default function PhotoUpload({ value, onChange }: PhotoUploadProps) {
         throw new Error('获取上传凭证失败: ' + errorText);
       }
 
-      const tokenData = await tokenResponse.json();
+      const responseText = await tokenResponse.text();
+      console.log('[PhotoUpload] Raw token response:', responseText);
+
+      const tokenData = JSON.parse(responseText);
       console.log('[PhotoUpload] Received uptoken, domain:', tokenData.domain);
 
       const { uptoken, domain } = tokenData;
