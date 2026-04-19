@@ -22,141 +22,169 @@
 文件存储：七牛云
 样式框架：Tailwind CSS + Radix UI
 部署平台：Vercel
+代码托管：GitHub
 
 ===============================================
 【快速部署】
 ===============================================
 
-第一步：配置 Supabase
-------------------------
-1. 登录 https://supabase.com
-2. 创建新项目或使用现有项目
-3. 在 SQL Editor 中执行建表（参考 环境变量配置清单.txt）
-
-建表 SQL：
-
--- 工资记录表
-CREATE TABLE IF NOT EXISTS wage_records (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  worker_name TEXT NOT NULL,
-  id_number TEXT,
-  bank_name TEXT,
-  card_number TEXT,
-  wage_amount NUMERIC,
-  settlement_date DATE,
-  photo_url TEXT,
-  notes TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- 物料记录表
-CREATE TABLE IF NOT EXISTS materials (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  type TEXT NOT NULL,
-  name TEXT NOT NULL,
-  quantity NUMERIC,
-  unit TEXT,
-  amount NUMERIC,
-  date DATE,
-  worker_name TEXT,
-  photo_url TEXT,
-  notes TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- 车辆记录表
-CREATE TABLE IF NOT EXISTS vehicles (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  plate_number TEXT NOT NULL,
-  driver_name TEXT,
-  driver_phone TEXT,
-  vehicle_type TEXT,
-  load_capacity NUMERIC,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- 启用 RLS (行级安全策略)
-ALTER TABLE wage_records ENABLE ROW LEVEL SECURITY;
-ALTER TABLE materials ENABLE ROW LEVEL SECURITY;
-ALTER TABLE vehicles ENABLE ROW LEVEL SECURITY;
-
--- 创建公开访问策略
-CREATE POLICY "Allow public access" ON wage_records FOR ALL USING (true);
-CREATE POLICY "Allow public access" ON materials FOR ALL USING (true);
-CREATE POLICY "Allow public access" ON vehicles FOR ALL USING (true);
-
--- 创建 Storage 存储桶（用于存放照片）
-INSERT INTO storage.buckets (id, name, public) VALUES ('materials-photos', 'materials-photos', true);
-
-CREATE POLICY "Allow public access" ON storage.objects FOR ALL USING (bucket_id = 'materials-photos');
-
-
-第二步：配置七牛云
-------------------------
-1. 登录 https://www.qiniu.com
-2. 创建存储空间（bucket）
-   - 区域：亚太-新加坡
-   - 访问控制：公开
-3. 配置自定义域名（如需 HTTPS 访问）
-   - 域名：www.yihaowang.top
-   - 配置 CNAME 解析
-   - 申请 SSL 证书（HTTPS必需）
-
-
-第三步：部署到 Vercel
-------------------------
-1. 登录 https://vercel.com
-2. 点击 "New Project"
-3. 导入 GitHub 仓库：yihaowang123/glxt
-4. 配置环境变量（在 Environment Variables 中添加）：
-   - NEXT_PUBLIC_SUPABASE_URL
-   - NEXT_PUBLIC_SUPABASE_ANON_KEY
-   - SUPABASE_SERVICE_ROLE_KEY
-   - QINIU_ACCESS_KEY
-   - QINIU_SECRET_KEY
-   - QINIU_BUCKET_NAME
-   - QINIU_DOMAIN
-   （参考 环境变量配置清单.txt）
-5. 点击 Deploy
-
-
-第四步：验证部署
-------------------------
-1. 访问 Vercel 分配的域名（或自定义域名）
-2. 测试各个功能模块
-3. 测试图片上传功能
-
-
 ===============================================
-【换电脑继续开发】
+场景一：在已有项目电脑上继续开发
 ===============================================
 
-1. 安装必要软件：
-   - Node.js 18+
-   - Git
-   - VS Code 或其他编辑器
+1. 更新代码：
+   git add .
+   git commit -m "更新内容"
+   git push origin main
 
-2. 克隆代码：
+2. Vercel 会自动部署
+
+===============================================
+场景二：在新电脑上开始开发
+===============================================
+
+第一步：从 GitHub 拉取代码
+------------------------
+1. 安装 Node.js 18+ 和 Git
+2. 克隆代码（需要是你的 GitHub 仓库）：
    git clone https://github.com/yihaowang123/glxt.git
    cd glxt
 
 3. 安装依赖：
    npm install
 
-4. 配置环境变量：
-   复制 .env.local.example 为 .env.local
-   填入环境变量（参考 环境变量配置清单.txt）
-
-5. 启动开发服务器：
+4. 启动开发服务器：
    npm run dev
 
+第二步：修改代码后推送
+------------------------
+1. 修改代码后，提交：
+   git add .
+   git commit -m "修改内容"
+
+2. 推送到 GitHub：
+   git push origin main
+
+3. Vercel 会自动检测到更新并部署
+
+===============================================
+场景三：创建新的 GitHub 仓库（新电脑/新账号）
+===============================================
+
+如果要在新电脑用新账号部署，按以下步骤：
+
+第一步：在 GitHub 创建新仓库
+------------------------
+1. 登录 GitHub
+2. 点击右上角 "+" → "New repository"
+3. 仓库名称填写：glxt（或你喜欢的名字）
+4. 选择 Private（私有）或 Public（公开）
+5. 不要勾选 "Add a README file"（我们已有代码）
+6. 点击 "Create repository"
+
+第二步：连接本地项目到新仓库
+------------------------
+1. 在项目文件夹打开终端
+
+2. 移除旧的 git 关联：
+   git remote remove origin
+
+3. 添加新的仓库地址：
+   git remote add origin https://github.com/你的用户名/仓库名.git
+
+   例如：
+   git remote add origin https://github.com/myaccount/my-glxt.git
+
+4. 推送代码：
+   git push -u origin main
+
+第三步：连接 Vercel
+------------------------
+1. 登录 https://vercel.com
+2. 点击 "New Project"
+3. 导入刚才创建的 GitHub 仓库
+4. 配置环境变量（参考 环境变量配置清单.txt）
+5. 点击 Deploy
+
+===============================================
+场景四：完全从头开始（新 Supabase + 新 Vercel）
+===============================================
+
+如果换了新的 Supabase 和 Vercel 账号：
+
+第一步：配置 Supabase
+------------------------
+1. 登录 https://supabase.com
+2. 创建新项目
+3. 等待项目创建完成，获取：
+   - Project URL
+   - anon/public key
+   - service_role key
+
+4. 在 SQL Editor 中执行 supabase/schema.sql 建表
+
+第二步：获取七牛云凭证
+------------------------
+1. 登录 https://www.qiniu.com
+2. 获取 Access Key 和 Secret Key
+3. 创建存储 bucket
+
+第三步：配置环境变量
+------------------------
+编辑 .env.local 文件，填入新的凭证：
+   NEXT_PUBLIC_SUPABASE_URL=你的Supabase URL
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=你的ANON_KEY
+   SUPABASE_SERVICE_ROLE_KEY=你的SERVICE_ROLE_KEY
+   QINIU_ACCESS_KEY=你的AK
+   QINIU_SECRET_KEY=你的SK
+   QINIU_BUCKET_NAME=你的bucket名称
+   QINIU_DOMAIN=你的下载域名
+
+第四步：推送到 GitHub
+------------------------
+git add .
+git commit -m "配置新环境"
+git push origin main
+
+第五步：部署到 Vercel
+------------------------
+1. 登录 Vercel
+2. Import GitHub 仓库
+3. 配置同样的环境变量
+4. Deploy
+
+===============================================
+【环境变量配置清单】
+===============================================
+
+变量名：NEXT_PUBLIC_SUPABASE_URL
+值：https://peecoclrmfnlqizpjdee.supabase.co
+
+变量名：NEXT_PUBLIC_SUPABASE_ANON_KEY
+值：eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBlZWNvY2xybWZubHFpenBqZGVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1MDM2OTYsImV4cCI6MjA5MjA3OTY5Nn0.aMnubTWlqnScHoFJXIQMU7qtH13aBA47dQQ-5voTbiM
+
+变量名：SUPABASE_SERVICE_ROLE_KEY
+值：eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBlZWNvY2xybWZubHFpenBqZGVlIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjUwMzY5NiwiZXhwIjoyMDkyMDc5Njk2fQ._JkYCVg2ViVGEkLOIvTiBxX9fU70kQZ6ZYnbX1NkaLo
+
+变量名：QINIU_ACCESS_KEY
+值：W7gnhGbvkWSPW90Vfz8KDpd4QzZzFhMUIl-gxwGv
+
+变量名：QINIU_SECRET_KEY
+值：EeazCLBveIPp2cAiuXKqV3yYZNAr4XuHjC7ABu60
+
+变量名：QINIU_BUCKET_NAME
+值：yihaowang234
+
+变量名：QINIU_DOMAIN
+值（HTTP）：http://www.yihaowang.top
+值（HTTPS）：https://www.yihaowang.top
 
 ===============================================
 【常见问题】
 ===============================================
+
+Q: 推送代码到 GitHub 报错 Permission denied
+A: 需要先登录 GitHub：在终端执行 git clone 会弹出登录框，或使用 GitHub Desktop
 
 Q: 图片上传后不显示
 A: 检查 QINIU_DOMAIN 是否使用 HTTPS。浏览器会阻止 HTTPS 页面加载 HTTP 图片。
@@ -168,9 +196,10 @@ Q: 七牛云 BadToken 错误
 A: 检查 Access Key 和 Secret Key 是否正确，确保和七牛云后台一致。
 
 ===============================================
-【联系方式】
+【GitHub 和 Vercel 快速访问】
 ===============================================
 GitHub: https://github.com/yihaowang123/glxt
+Vercel: https://vercel.com/dashboard
 Supabase: https://supabase.com/dashboard/project/peecoclrmfnlqizpjdee
 
 ===============================================
