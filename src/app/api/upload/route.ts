@@ -37,12 +37,18 @@ export async function POST() {
     const bucket = process.env.QINIU_BUCKET_NAME;
     const domain = process.env.QINIU_DOMAIN;
 
+    console.log('[Upload] AK:', accessKey);
+    console.log('[Upload] SK:', secretKey ? `${secretKey.substring(0, 4)}...` : 'MISSING');
+    console.log('[Upload] Bucket:', bucket);
+    console.log('[Upload] Domain:', domain);
+
     if (!accessKey || !secretKey || !bucket || !domain) {
       console.error('[Upload] Missing configuration!');
       return NextResponse.json({ error: 'Missing Qiniu configuration' }, { status: 500 });
     }
 
     const uploadToken = generateUploadToken(accessKey, secretKey, bucket);
+    console.log('[Upload] Generated token:', uploadToken);
 
     return NextResponse.json({ uptoken: uploadToken, domain: domain });
   } catch (error) {
