@@ -7,10 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { createClient } from '@/lib/supabase';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { Plus, Search, Package } from 'lucide-react';
+import { Plus, Package } from 'lucide-react';
 import PhotoUpload from '@/components/ui/photo-upload';
 import { ClickableImage } from '@/components/ui/image-preview';
 import { WorkerNameInput } from '@/components/ui/worker-name-input';
+import { SearchNameInput } from '@/components/ui/search-name-input';
 import type { MaterialRecord, MaterialType } from '@/types';
 
 const materialTypes: { value: MaterialType; label: string }[] = [
@@ -177,6 +178,7 @@ export default function MaterialsPage() {
             value={formData.worker_name || ''}
             onChange={(val) => setFormData({ ...formData, worker_name: val })}
             onAutoFill={handleAutoFill}
+            materialType={selectedType}
           />
         )}
 
@@ -217,11 +219,6 @@ export default function MaterialsPage() {
           </>
         ) : selectedType === 'freight' ? (
           <>
-            <WorkerNameInput
-              value={formData.worker_name || ''}
-              onChange={(val) => setFormData({ ...formData, worker_name: val })}
-              onAutoFill={handleAutoFill}
-            />
             <div className="space-y-2">
               <label className="text-sm font-medium">规格</label>
               <Input
@@ -293,11 +290,6 @@ export default function MaterialsPage() {
           </>
         ) : selectedType === 'external_brick' || selectedType === 'internal_brick' ? (
           <>
-            <WorkerNameInput
-              value={formData.worker_name || ''}
-              onChange={(val) => setFormData({ ...formData, worker_name: val })}
-              onAutoFill={handleAutoFill}
-            />
             <div className="space-y-2">
               <label className="text-sm font-medium">规格</label>
               <Input
@@ -371,6 +363,7 @@ export default function MaterialsPage() {
               value={formData.worker_name || ''}
               onChange={(val) => setFormData({ ...formData, worker_name: val })}
               onAutoFill={handleAutoFill}
+              materialType={selectedType}
             />
             <div className="space-y-2">
               <label className="text-sm font-medium">规格</label>
@@ -503,12 +496,10 @@ export default function MaterialsPage() {
 
       <main className="p-4 space-y-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-          <Input
-            placeholder="搜索姓名或名称..."
+          <SearchNameInput
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 mobile-touch-target"
+            onChange={setSearchTerm}
+            materialType={selectedType}
           />
         </div>
 

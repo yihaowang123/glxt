@@ -2,25 +2,16 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
-import { ChevronDown, Loader2, X } from 'lucide-react';
+import { Search, ChevronDown, Loader2, X } from 'lucide-react';
 import { createClient } from '@/lib/supabase';
-import type { MaterialRecord, MaterialType } from '@/types';
 
-interface WorkerNameInputProps {
+interface SearchNameInputProps {
   value: string;
   onChange: (value: string) => void;
-  onAutoFill?: (data: Partial<MaterialRecord>) => void;
-  placeholder?: string;
-  materialType?: MaterialType;
+  materialType?: string;
 }
 
-export function WorkerNameInput({
-  value,
-  onChange,
-  onAutoFill,
-  placeholder = '请输入或选择姓名',
-  materialType
-}: WorkerNameInputProps) {
+export function SearchNameInput({ value, onChange, materialType }: SearchNameInputProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -54,7 +45,7 @@ export function WorkerNameInput({
     try {
       let query = supabase
         .from('material_records')
-        .select('worker_name, name, spec, color, unit_price, unit_price_1, unit_price_2')
+        .select('worker_name')
         .not('worker_name', 'is', null)
         .not('worker_name', 'eq', '')
         .order('created_at', { ascending: false });
@@ -76,45 +67,10 @@ export function WorkerNameInput({
     }
   };
 
-  const handleSelect = async (name: string) => {
+  const handleSelect = (name: string) => {
     setInputValue(name);
     onChange(name);
     setIsOpen(false);
-
-    if (onAutoFill) {
-      setIsLoading(true);
-      try {
-        let query = supabase
-          .from('material_records')
-          .select('name, spec, color, unit_price, unit_price_1, unit_price_2')
-          .eq('worker_name', name)
-          .order('created_at', { ascending: false })
-          .limit(1);
-
-        if (materialType) {
-          query = query.eq('type', materialType);
-        }
-
-        const { data, error } = await query.limit(1).single();
-
-        if (error) throw error;
-
-        if (data) {
-          const fillData: Partial<MaterialRecord> = {};
-          if (data.name) fillData.name = data.name;
-          if (data.spec) fillData.spec = data.spec;
-          if (data.color) fillData.color = data.color;
-          if (data.unit_price) fillData.unit_price = data.unit_price;
-          if (data.unit_price_1) fillData.unit_price_1 = data.unit_price_1;
-          if (data.unit_price_2) fillData.unit_price_2 = data.unit_price_2;
-          onAutoFill(fillData);
-        }
-      } catch (error) {
-        console.error('Failed to fetch auto-fill data:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,35 +91,33 @@ export function WorkerNameInput({
   );
 
   return (
-    <div className="space-y-2" ref={wrapperRef}>
-      <label className="text-sm font-medium">姓名</label>
-      <div className="relative">
-        <Input
-          value={inputValue}
-          onChange={handleInputChange}
-          onFocus={() => setIsOpen(true)}
-          placeholder={placeholder}
-          className="mobile-touch-target pr-10"
-        />
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-          {isLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
-          {inputValue && !isLoading && (
-            <button
-              type="button"
-              onClick={handleClear}
-              className="p-1 hover:bg-muted rounded"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
+    <div className="relative" ref={wrapperRef}>
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+      <Input
+        placeholder="搜索姓名或名称..."
+        value={inputValue}
+        onChange={handleInputChange}
+        onFocus={() => setIsOpen(true)}
+        className="pl-10 mobile-touch-target pr-20"
+      />
+      <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+        {isLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+        {inputValue && !isLoading && (
           <button
             type="button"
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={handleClear}
             className="p-1 hover:bg-muted rounded"
           >
-            <ChevronDown className="h-4 w-4" />
+            <X className="h-4 w-4" />
           </button>
-        </div>
+        )}
+        <button
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className="p-1 hover:bg-muted rounded"
+        >
+          <ChevronDown className="h-4 w-4" />
+        </button>
       </div>
 
       {isOpen && (
