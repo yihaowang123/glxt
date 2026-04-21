@@ -10,6 +10,7 @@ import { formatCurrency, formatDate } from '@/lib/utils';
 import { Plus, Search, Package } from 'lucide-react';
 import PhotoUpload from '@/components/ui/photo-upload';
 import { ClickableImage } from '@/components/ui/image-preview';
+import { WorkerNameInput } from '@/components/ui/worker-name-input';
 import type { MaterialRecord, MaterialType } from '@/types';
 
 const materialTypes: { value: MaterialType; label: string }[] = [
@@ -152,6 +153,13 @@ export default function MaterialsPage() {
     return 0;
   };
 
+  const handleAutoFill = (data: Partial<MaterialRecord>) => {
+    setFormData(prev => ({
+      ...prev,
+      ...data,
+    }));
+  };
+
   const renderFormFields = () => {
     const needsPhoto = typesWithPhoto.includes(selectedType);
 
@@ -165,14 +173,11 @@ export default function MaterialsPage() {
         )}
 
         {selectedType !== 'site_supply' && (
-          <div className="space-y-2">
-            <label className="text-sm font-medium">姓名</label>
-            <Input
-              value={formData.worker_name || ''}
-              onChange={(e) => setFormData({ ...formData, worker_name: e.target.value })}
-              className="mobile-touch-target"
-            />
-          </div>
+          <WorkerNameInput
+            value={formData.worker_name || ''}
+            onChange={(val) => setFormData({ ...formData, worker_name: val })}
+            onAutoFill={handleAutoFill}
+          />
         )}
 
         <div className="space-y-2">
@@ -212,14 +217,11 @@ export default function MaterialsPage() {
           </>
         ) : selectedType === 'freight' ? (
           <>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">姓名</label>
-              <Input
-                value={formData.worker_name || ''}
-                onChange={(e) => setFormData({ ...formData, worker_name: e.target.value })}
-                className="mobile-touch-target"
-              />
-            </div>
+            <WorkerNameInput
+              value={formData.worker_name || ''}
+              onChange={(val) => setFormData({ ...formData, worker_name: val })}
+              onAutoFill={handleAutoFill}
+            />
             <div className="space-y-2">
               <label className="text-sm font-medium">规格</label>
               <Input
@@ -291,14 +293,11 @@ export default function MaterialsPage() {
           </>
         ) : selectedType === 'external_brick' || selectedType === 'internal_brick' ? (
           <>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">姓名</label>
-              <Input
-                value={formData.worker_name || ''}
-                onChange={(e) => setFormData({ ...formData, worker_name: e.target.value })}
-                className="mobile-touch-target"
-              />
-            </div>
+            <WorkerNameInput
+              value={formData.worker_name || ''}
+              onChange={(val) => setFormData({ ...formData, worker_name: val })}
+              onAutoFill={handleAutoFill}
+            />
             <div className="space-y-2">
               <label className="text-sm font-medium">规格</label>
               <Input
@@ -368,6 +367,11 @@ export default function MaterialsPage() {
           </>
         ) : selectedType === 'site_supply' ? (
           <>
+            <WorkerNameInput
+              value={formData.worker_name || ''}
+              onChange={(val) => setFormData({ ...formData, worker_name: val })}
+              onAutoFill={handleAutoFill}
+            />
             <div className="space-y-2">
               <label className="text-sm font-medium">规格</label>
               <Input
