@@ -54,7 +54,7 @@ export function WorkerNameInput({
     try {
       let query = supabase
         .from('material_records')
-        .select('worker_name, name, spec, color, unit_price, unit_price_1, unit_price_2')
+        .select('worker_name, name, spec, color, unit_price, unit_price_1, unit_price_2, delivery_location')
         .not('worker_name', 'is', null)
         .not('worker_name', 'eq', '')
         .order('created_at', { ascending: false });
@@ -86,7 +86,7 @@ export function WorkerNameInput({
       try {
         let query = supabase
           .from('material_records')
-          .select('name, spec, color, unit_price, unit_price_1, unit_price_2')
+          .select('name, spec, color, unit_price, unit_price_1, unit_price_2, delivery_location')
           .eq('worker_name', name)
           .order('created_at', { ascending: false })
           .limit(1);
@@ -107,6 +107,7 @@ export function WorkerNameInput({
           if (data.unit_price) fillData.unit_price = data.unit_price;
           if (data.unit_price_1) fillData.unit_price_1 = data.unit_price_1;
           if (data.unit_price_2) fillData.unit_price_2 = data.unit_price_2;
+          if (data.delivery_location) fillData.delivery_location = data.delivery_location;
           onAutoFill(fillData);
         }
       } catch (error) {

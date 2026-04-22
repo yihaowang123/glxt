@@ -227,6 +227,15 @@ export default function MaterialsPage() {
                 className="mobile-touch-target"
               />
             </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">送货地点</label>
+              <Input
+                value={formData.delivery_location || ''}
+                onChange={(e) => setFormData({ ...formData, delivery_location: e.target.value })}
+                placeholder="请输入或选择送货地点"
+                className="mobile-touch-target"
+              />
+            </div>
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-2">
                 <label className="text-sm font-medium">数量（块）</label>
@@ -460,12 +469,39 @@ export default function MaterialsPage() {
         <CardContent className="p-4">
           <div className="flex justify-between items-start">
             <div className="flex-1">
-              <p className="font-semibold text-lg">{record.name}</p>
-              <p className="text-sm text-gray-500">{record.worker_name || '未填写'}</p>
-              <p className="text-sm text-gray-600 mt-1">{details}</p>
-              <p className="text-sm text-gray-500 mt-1">{formatDate(record.date)}</p>
-              {record.photo_url && (
-                <ClickableImage src={record.photo_url} alt="Photo" className="w-16 h-16 object-cover rounded mt-2" />
+              {selectedType === 'freight' ? (
+                <>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <span className="text-gray-500">姓名：</span>
+                      <span className="font-medium">{record.worker_name || '未填写'}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">名称：</span>
+                      <span className="font-medium">{record.name || '未填写'}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">规格：</span>
+                      <span className="font-medium">{record.spec || '未填写'}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">送货地点：</span>
+                      <span className="font-medium">{record.delivery_location || '未填写'}</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600 mt-2">{details}</p>
+                  <p className="text-sm text-gray-500 mt-1">{formatDate(record.date)}</p>
+                </>
+              ) : (
+                <>
+                  <p className="font-semibold text-lg">{record.name}</p>
+                  <p className="text-sm text-gray-500">{record.worker_name || '未填写'}</p>
+                  <p className="text-sm text-gray-600 mt-1">{details}</p>
+                  <p className="text-sm text-gray-500 mt-1">{formatDate(record.date)}</p>
+                  {record.photo_url && (
+                    <ClickableImage src={record.photo_url} alt="Photo" className="w-16 h-16 object-cover rounded mt-2" />
+                  )}
+                </>
               )}
             </div>
             <div className="text-right">

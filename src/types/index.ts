@@ -91,6 +91,7 @@ export interface MaterialRecord {
   unit_price_2?: number;
   vehicle_number?: string;
   ticket_number?: string;
+  delivery_location?: string;
   // 外调砖和内调砖专用
   color?: string;
   driver?: string;
