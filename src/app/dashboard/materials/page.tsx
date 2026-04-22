@@ -60,7 +60,11 @@ export default function MaterialsPage() {
         .order('date', { ascending: false });
 
       if (searchTerm) {
-        query = query.or(`name.ilike.%${searchTerm}%,worker_name.ilike.%${searchTerm}%`);
+        if (selectedType === 'freight') {
+          query = query.or(`name.ilike.%${searchTerm}%,worker_name.ilike.%${searchTerm}%,delivery_location.ilike.%${searchTerm}%`);
+        } else {
+          query = query.or(`name.ilike.%${searchTerm}%,worker_name.ilike.%${searchTerm}%`);
+        }
       }
       if (startDate) {
         query = query.gte('date', startDate);

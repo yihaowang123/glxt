@@ -14,7 +14,7 @@ interface SearchNameInputProps {
 export function SearchNameInput({ value, onChange, materialType }: SearchNameInputProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<{ type: 'name' | 'location'; value: string }[]>([]);
   const [inputValue, setInputValue] = useState(value);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
@@ -45,9 +45,7 @@ export function SearchNameInput({ value, onChange, materialType }: SearchNameInp
     try {
       let query = supabase
         .from('material_records')
-        .select('worker_name')
-        .not('worker_name', 'is', null)
-        .not('worker_name', 'eq', '')
+        .select('worker_name, delivery_location')
         .order('created_at', { ascending: false });
 
       if (materialType) {
@@ -58,8 +56,20 @@ export function SearchNameInput({ value, onChange, materialType }: SearchNameInp
 
       if (error) throw error;
 
-      const uniqueNames = [...new Set(data?.map(r => r.worker_name).filter(Boolean) as string[])];
-      setSuggestions(uniqueNames);
+      const result: { type: 'name' | 'location'; value: string }[] = [];
+
+      if (materialType === 'freight') {
+        const uniqueNames = [...new Set(data?.map(r => r.worker_name).filter(Boolean) as string[])];
+        const uniqueLocations = [...new Set(data?.map(r => r.delivery_location).filter(Boolean) as string[])];
+
+        uniqueNames.forEach(name => result.push({ type: 'name', value: name }));
+        uniqueLocations.forEach(loc => result.push({ type: 'location', value: loc }));
+      } else {
+        const uniqueNames = [...new Set(data?.map(r => r.worker_name).filter(Boolean) as string[])];
+        uniqueNames.forEach(name => result.push({ type: 'name', value: name }));
+      }
+
+      setSuggestions(result);
     } catch (error) {
       console.error('Failed to fetch history:', error);
     } finally {
@@ -67,9 +77,9 @@ export function SearchNameInput({ value, onChange, materialType }: SearchNameInp
     }
   };
 
-  const handleSelect = (name: string) => {
-    setInputValue(name);
-    onChange(name);
+  const handleSelect = (item: { type: 'name' | 'location'; value: string }) => {
+    setInputValue(item.value);
+    onChange(item.value);
     setIsOpen(false);
   };
 
@@ -86,15 +96,15 @@ export function SearchNameInput({ value, onChange, materialType }: SearchNameInp
     setSuggestions([]);
   };
 
-  const filteredSuggestions = suggestions.filter(name =>
-    name.toLowerCase().includes(inputValue.toLowerCase())
+  const filteredSuggestions = suggestions.filter(item =>
+    item.value.toLowerCase().includes(inputValue.toLowerCase())
   );
 
   return (
     <div className="relative" ref={wrapperRef}>
       <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
       <Input
-        placeholder="搜索姓名或名称..."
+        placeholder={materialType === 'freight' ? '搜索姓名、送货地点...' : '搜索姓名或名称...'}
         value={inputValue}
         onChange={handleInputChange}
         onFocus={() => setIsOpen(true)}
@@ -128,14 +138,19 @@ export function SearchNameInput({ value, onChange, materialType }: SearchNameInp
             <div className="p-2 text-sm text-muted-foreground">无历史记录</div>
           ) : (
             <div className="py-1">
-              {filteredSuggestions.map((name, index) => (
+              {filteredSuggestions.map((item, index) => (
                 <button
-                  key={`${name}-${index}`}
+                  key={`${item.type}-${item.value}-${index}`}
                   type="button"
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-muted cursor-pointer"
-                  onClick={() => handleSelect(name)}
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-muted cursor-pointer flex items-center gap-2"
+                  onClick={() => handleSelect(item)}
                 >
-                  {name}
+                  {item.type === 'name' ? (
+                    <span className="text-gray-400 text-xs">姓名</span>
+                  ) : (
+                    <span className="text-blue-400 text-xs">地点</span>
+                  )}
+                  <span>{item.value}</span>
                 </button>
               ))}
             </div>
