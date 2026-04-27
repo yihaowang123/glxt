@@ -663,7 +663,7 @@ export default function WorkerDetailPage() {
                   <Input type="number" value={newWorkForm.blocks} onChange={(e) => setNewWorkForm({ ...newWorkForm, blocks: e.target.value })} className="mobile-touch-target" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">包数</label>
+                  <label className="text-sm font-medium">板数</label>
                   <Input type="number" value={newWorkForm.packages} onChange={(e) => setNewWorkForm({ ...newWorkForm, packages: e.target.value })} className="mobile-touch-target" />
                 </div>
               </div>

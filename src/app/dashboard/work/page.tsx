@@ -477,7 +477,7 @@ export default function WorkPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">包数</label>
+                  <label className="text-sm font-medium">板数</label>
                   <Input
                     type="number"
                     value={newRecord.packages}

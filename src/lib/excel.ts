@@ -70,7 +70,7 @@ export async function exportWorkersToExcel(
     const unsettledRecords = (workRecords.get(worker.id) || []).filter(r => !r.is_settled);
     if (unsettledRecords.length > 0) {
       sheet.addRow(['未结算工作记录']);
-      sheet.addRow(['日期', '规格', '块数', '包数', '工资']);
+      sheet.addRow(['日期', '规格', '块数', '板数', '工资']);
       unsettledRecords.forEach((record) => {
         sheet.addRow([record.date, record.spec || '', record.blocks, record.packages, record.wage || 0]);
       });
@@ -80,7 +80,7 @@ export async function exportWorkersToExcel(
     const settledRecords = (workRecords.get(worker.id) || []).filter(r => r.is_settled);
     if (settledRecords.length > 0) {
       sheet.addRow(['已结算工作记录']);
-      sheet.addRow(['日期', '规格', '块数', '包数', '工资', '结算日期']);
+      sheet.addRow(['日期', '规格', '块数', '板数', '工资', '结算日期']);
       settledRecords.forEach((record) => {
         sheet.addRow([
           record.date,
@@ -136,7 +136,7 @@ export async function exportWorkRecordsToExcel(
   const workbook = new ExcelJS.Workbook();
   const sheet = workbook.addWorksheet('工作记录');
 
-  sheet.addRow(['姓名', '日期', '规格', '块数', '包数', '工资', '结算状态']);
+  sheet.addRow(['姓名', '日期', '规格', '块数', '板数', '工资', '结算状态']);
   records.forEach((record) => {
     sheet.addRow([
       record.worker_name || '',
